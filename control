@@ -1,0 +1,9 @@
+Package: com.jontelang.syslogwindow
+Name: syslogWindow
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: Jonathan Winger-lang
+Author: Jonathan Winger-lang
+Section: Tweaks
