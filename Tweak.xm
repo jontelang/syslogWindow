@@ -5,23 +5,23 @@ static BOOL hasstarted = NO;
 @end
 
 @implementation LogWindow
--(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
-	BOOL o = [super pointInside:point withEvent:event];
-  	NSLog(@"LogWindow - pointInside: %i", o);
-  	NSLog(@"LogWindow - subviews: %@", self.subviews);
-  	return NO;
-}
+// -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
+// 	BOOL o = [super pointInside:point withEvent:event];
+//   	NSLog(@"LogWindow - pointInside: %i", o);
+//   	NSLog(@"LogWindow - subviews: %@", self.subviews);
+//   	return NO;
+// }
 @end
 
 @interface UIPassThroughLabel : UILabel
 @end
 
 @implementation UIPassThroughLabel
--(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
-	BOOL o = [super pointInside:point withEvent:event];
-  	NSLog(@"UIPassThroughLabel - pointInside: %i", o);
-  	return NO;
-}
+// -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
+// 	BOOL o = [super pointInside:point withEvent:event];
+//   	NSLog(@"UIPassThroughLabel - pointInside: %i", o);
+//   	return NO;
+// }
 @end
 
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter();
