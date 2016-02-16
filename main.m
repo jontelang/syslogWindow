@@ -179,7 +179,7 @@ ssize_t write_colored(int fd, void* buffer, size_t len) {
     NSDictionary *original = @{@"message":build};
     CFDictionaryRef dict = (__bridge CFDictionaryRef)original;
     CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
-                                         CFSTR("com.jontelang.snapper2.sharesnap2GRR"),
+                                         CFSTR("com.syslogWindow.syslogMethodCallback"),
                                          NULL,
                                          dict,
                                          YES);
