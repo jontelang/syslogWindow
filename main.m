@@ -9,26 +9,6 @@ extern CFNotificationCenterRef CFNotificationCenterGetDistributedCenter();
 
 #define SOCKET_PATH "/var/run/lockdown/syslog.sock"
 
-#define COLOR_RESET         "\e[m"
-#define COLOR_NORMAL        "\e[0m"
-#define COLOR_DARK          "\e[2m"
-#define COLOR_RED           "\e[0;31m"
-#define COLOR_DARK_RED      "\e[2;31m"
-#define COLOR_GREEN         "\e[0;32m"
-#define COLOR_DARK_GREEN    "\e[2;32m"
-#define COLOR_YELLOW        "\e[0;33m"
-#define COLOR_DARK_YELLOW   "\e[2;33m"
-#define COLOR_BLUE          "\e[0;34m"
-#define COLOR_DARK_BLUE     "\e[2;34m"
-#define COLOR_MAGENTA       "\e[0;35m"
-#define COLOR_DARK_MAGENTA  "\e[2;35m"
-#define COLOR_CYAN          "\e[0;36m"
-#define COLOR_DARK_CYAN     "\e[2;36m"
-#define COLOR_WHITE         "\e[0;37m"
-#define COLOR_DARK_WHITE    "\e[0;37m"
-
-
-
 size_t atomicio(ssize_t (*f) (int, void *, size_t), int fd, void *_s, size_t n)
 {
   char *s = _s;
@@ -83,110 +63,20 @@ int unix_connect(char* path) {
   return (s);
 }
 
-#define LINE_REGEX "(\\w+\\s+\\d+\\s+\\d+:\\d+:\\d+)\\s+(\\S+|)\\s+(\\w+)\\[(\\d+)\\]\\s+\\<(\\w+)\\>:\\s(.*)"
-
 ssize_t write_colored(int fd, void* buffer, size_t len) {
-
   char *escapedBuffer = malloc(len + 1);
   memcpy(escapedBuffer, buffer, len);
   escapedBuffer[len] = '\0';
 
   NSString *str = [NSString stringWithUTF8String:escapedBuffer];
+
+  NSDictionary *original = @{@"message":str};
+  CFDictionaryRef dict = (__bridge CFDictionaryRef)original;
+  CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
+                                       CFSTR("com.syslogWindow.syslogMethodCallback"),
+                                       NULL,dict,YES);
+
   free(escapedBuffer);
-
-  NSError *error = nil;
-  NSRegularExpression *regex = [NSRegularExpression
-                                  regularExpressionWithPattern:@LINE_REGEX
-                                  options:NSRegularExpressionCaseInsensitive
-                                  error:&error];
-
-  NSArray *matches = [regex matchesInString:str
-                            options:0
-                            range:NSMakeRange(0, [str length])];
-
-  if ([matches count] == 0)
-    return write(fd, buffer, len);
-
-  for (NSTextCheckingResult *match in matches) {
-
-    if ([match numberOfRanges] < 6) {
-      write(fd, buffer, len); // if entry doesn't match regex, print uncolored
-      continue;
-    }
-
-    // NSRange dateRange    =  [match rangeAtIndex:1];
-    // NSRange deviceRange  =  [match rangeAtIndex:2];
-    NSRange processRange =  [match rangeAtIndex:3];
-    // NSRange pidRange     =  [match rangeAtIndex:4];
-    NSRange typeRange    =  [match rangeAtIndex:5];
-    NSRange logRange     =  [match rangeAtIndex:6];
-
-    // NSString *date       =  [str substringWithRange:dateRange];
-    // NSString *device     =  [str substringWithRange:deviceRange];
-    NSString *process    =  [str substringWithRange:processRange];
-    // NSString *pid        =  [str substringWithRange:pidRange];
-    NSString *type       =  [str substringWithRange:typeRange];
-    NSString *log        =  [str substringWithRange:
-                                  NSMakeRange(logRange.location,
-                                              [str length] - logRange.location)];
-
-    log = [log stringByTrimmingCharactersInSet:
-                [NSCharacterSet newlineCharacterSet]];
-
-    NSMutableString *build = [NSMutableString new];
-
-    // [build appendString:@COLOR_DARK_WHITE];
-    // [build appendString:date];
-    // [build appendString:@" "];
-    // [build appendString:device];
-    // [build appendString:@" "];
-
-    // [build appendString:@COLOR_CYAN];
-    [build appendString:process];
-    // [build appendString:@"["];
-    // [build appendString:pid];
-    // [build appendString:@"]"];
-
-    char *typeColor = COLOR_DARK_WHITE;
-    char *darkTypeColor = COLOR_DARK_WHITE;
-
-    if ([type isEqualToString:@"Notice"]) {
-      typeColor = COLOR_GREEN;
-      darkTypeColor = COLOR_DARK_GREEN;
-    } else if ([type isEqualToString:@"Warning"]) {
-      typeColor = COLOR_YELLOW;
-      darkTypeColor = COLOR_DARK_YELLOW;
-    } else if ([type isEqualToString:@"Error"]) {
-      typeColor = COLOR_RED;
-      darkTypeColor = COLOR_DARK_RED;
-    } else if ([type isEqualToString:@"Debug"]) {
-      typeColor = COLOR_MAGENTA;
-      darkTypeColor = COLOR_DARK_MAGENTA;
-    }
-
-    // [build appendString:@(darkTypeColor)];
-    [build appendString:@" <"];
-    // [build appendString:@(typeColor)];
-    [build appendString:type];
-    // [build appendString:@(darkTypeColor)];
-    [build appendString:@">"];
-    // [build appendString:@COLOR_RESET];
-    [build appendString:@": "];
-    [build appendString:log];
-
-    // printf("%s\n", [build UTF8String]);
-
-    NSDictionary *original = @{@"message":build};
-    CFDictionaryRef dict = (__bridge CFDictionaryRef)original;
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
-                                         CFSTR("com.syslogWindow.syslogMethodCallback"),
-                                         NULL,
-                                         dict,
-                                         YES);
-
-    [build release];
-  }
-
   return len;
 }
 
@@ -207,14 +97,7 @@ int startTheSyslogThingy() {
   pfd[0].fd = nfd;
   pfd[0].events = POLLIN;
 
-  // int max = 1000;
-  // int cur = 0;
   while (pfd[0].fd != -1) {
-    // cur++;
-    // if(cur>max){
-      // NSLog(@"returning from while loop");
-      // return 0;
-    // }
 
     if ((n = poll(pfd, 1, -1)) < 0) {
       close(nfd);

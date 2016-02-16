@@ -29,9 +29,78 @@
   return self;
 }
 
+#define LINE_REGEX "(\\w+\\s+\\d+\\s+\\d+:\\d+:\\d+)\\s+(\\S+|)\\s+(\\w+)\\[(\\d+)\\]\\s+\\<(\\w+)\\>:\\s(.*)"
 -(void)addSyslogMessage:(NSString*)message{
+
+NSError *error = nil;
+  NSRegularExpression *regex = [NSRegularExpression
+                                  regularExpressionWithPattern:@LINE_REGEX
+                                  options:NSRegularExpressionCaseInsensitive
+                                  error:&error];
+
+  NSArray *matches = [regex matchesInString:message 
+                            options:0
+                            range:NSMakeRange(0, [message length])];
+
+  // if ([matches count] == 0)
+    // return write(fd, buffer, len);
+
+  for (NSTextCheckingResult *match in matches) {
+
+    if ([match numberOfRanges] < 6) {
+      //write(fd, buffer, len); // if entry doesn't match regex, print uncolored
+      continue;
+    }
+
+    // NSRange dateRange    =  [match rangeAtIndex:1];
+    // NSRange deviceRange  =  [match rangeAtIndex:2];
+    NSRange processRange =  [match rangeAtIndex:3];
+    // NSRange pidRange     =  [match rangeAtIndex:4];
+    NSRange typeRange    =  [match rangeAtIndex:5];
+    NSRange logRange     =  [match rangeAtIndex:6];
+
+    // NSString *date       =  [message substringWithRange:dateRange];
+    // NSString *device     =  [message substringWithRange:deviceRange];
+    NSString *process    =  [message substringWithRange:processRange];
+    // NSString *pid        =  [message substringWithRange:pidRange];
+    NSString *type       =  [message substringWithRange:typeRange];
+    NSString *log        =  [message substringWithRange:
+                                  NSMakeRange(logRange.location,
+                                              [message length] - logRange.location)];
+
+    log = [log stringByTrimmingCharactersInSet:
+                [NSCharacterSet newlineCharacterSet]];
+
+    NSMutableString *build = [NSMutableString new];
+
+    // [build appendString:@COLOR_DARK_WHITE];
+    // [build appendString:date];
+    // [build appendString:@" "];
+    // [build appendString:device];
+    // [build appendString:@" "];
+
+    // [build appendString:@COLOR_CYAN];
+    [build appendString:process];
+    // [build appendString:@"["];
+    // [build appendString:pid];
+    // [build appendString:@"]"];
+
+    // [build appendString:@(darkTypeColor)];
+    [build appendString:@" <"];
+    // [build appendString:@(typeColor)];
+    [build appendString:type];
+    // [build appendString:@(darkTypeColor)];
+    [build appendString:@">"];
+    // [build appendString:@COLOR_RESET];
+    [build appendString:@": "];
+    [build appendString:log];
+
+    [msgs addObject:build];
+    
+    }
+    // printf("%s\n", [build UTF8String]);
+
     // Only save the 10 latest messages
-    [msgs addObject:message];
     if([msgs count]>10){
       [msgs removeObjectAtIndex:0];
     }
