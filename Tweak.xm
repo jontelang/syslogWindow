@@ -9,7 +9,7 @@ static BOOL hasstarted = NO;
 	BOOL o = [super pointInside:point withEvent:event];
   	NSLog(@"LogWindow - pointInside: %i", o);
   	NSLog(@"LogWindow - subviews: %@", self.subviews);
-  	return o;
+  	return NO;
 }
 @end
 
@@ -17,13 +17,11 @@ static BOOL hasstarted = NO;
 @end
 
 @implementation UIPassThroughLabel
-
 -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
 	BOOL o = [super pointInside:point withEvent:event];
   	NSLog(@"UIPassThroughLabel - pointInside: %i", o);
-  	return o;
+  	return NO;
 }
-
 @end
 
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter();
@@ -55,20 +53,23 @@ static void shareSnap(CFNotificationCenterRef center,
     }
 
     if( logWindow == nil ){
-      if( [[[UIDevice currentDevice] systemVersion] floatValue] > 9.0f){
-        logWindow = [[LogWindow alloc] init];//WithFrame:[UIScreen mainScreen].bounds];
-      }else{
-        logWindow = [[LogWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-      }
+      // if( [[[UIDevice currentDevice] systemVersion] floatValue] > 9.0f){
+      //   logWindow = [[LogWindow alloc] init];//WithFrame:[UIScreen mainScreen].bounds];
+      // }else{
+        // logWindow = [[LogWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        logWindow = [[LogWindow alloc] initWithFrame:CGRectMake(20,150,150,200)];
+      // }
 
       // logWindow.backgroundColor = [UIColor clearColor];
       logWindow.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.25f];
       logWindow.userInteractionEnabled = YES;
       [logWindow setWindowLevel:UIWindowLevelStatusBar+10000];
+      logWindow.layer.borderWidth = 1.0f;
+      logWindow.layer.borderColor = [UIColor redColor].CGColor;
       [logWindow makeKeyAndVisible];
       // logWindow.exclusiveTouch = YES;
 
-      l = [[UIPassThroughLabel alloc] initWithFrame:CGRectMake(1,1,318,200)];
+      l = [[UIPassThroughLabel alloc] initWithFrame:CGRectMake(0,0,150,180)];
       l.textAlignment = NSTextAlignmentLeft;
       l.userInteractionEnabled = YES;
       l.adjustsFontSizeToFitWidth = YES;
