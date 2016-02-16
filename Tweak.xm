@@ -6,8 +6,10 @@ static BOOL hasstarted = NO;
 
 @implementation LogWindow
 -(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
-  NSLog(@"LogWindow - pointInside");
-  return NO;
+	BOOL o = [super pointInside:point withEvent:event];
+  	NSLog(@"LogWindow - pointInside: %i", o);
+  	NSLog(@"LogWindow - subviews: %@", self.subviews);
+  	return o;
 }
 @end
 
@@ -16,14 +18,10 @@ static BOOL hasstarted = NO;
 
 @implementation UIPassThroughLabel
 
--(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{ 
-  NSLog(@"UIPassThroughLabel - pointInside");
-  return NO; 
-}
-
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
-  NSLog(@"UIPassThroughLabel - hitTest");
-  return nil;
+-(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event{
+	BOOL o = [super pointInside:point withEvent:event];
+  	NSLog(@"UIPassThroughLabel - pointInside: %i", o);
+  	return o;
 }
 
 @end
@@ -57,17 +55,22 @@ static void shareSnap(CFNotificationCenterRef center,
     }
 
     if( logWindow == nil ){
-      logWindow = [[LogWindow alloc] init];//WithFrame:[UIScreen mainScreen].bounds];
-      logWindow.backgroundColor = [UIColor clearColor];
-      // logWindow.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.25f];
-      logWindow.userInteractionEnabled = NO;
+      if( [[[UIDevice currentDevice] systemVersion] floatValue] > 9.0f){
+        logWindow = [[LogWindow alloc] init];//WithFrame:[UIScreen mainScreen].bounds];
+      }else{
+        logWindow = [[LogWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+      }
+
+      // logWindow.backgroundColor = [UIColor clearColor];
+      logWindow.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.25f];
+      logWindow.userInteractionEnabled = YES;
       [logWindow setWindowLevel:UIWindowLevelStatusBar+10000];
       [logWindow makeKeyAndVisible];
       // logWindow.exclusiveTouch = YES;
 
       l = [[UIPassThroughLabel alloc] initWithFrame:CGRectMake(1,1,318,200)];
       l.textAlignment = NSTextAlignmentLeft;
-      l.userInteractionEnabled = NO;
+      l.userInteractionEnabled = YES;
       l.adjustsFontSizeToFitWidth = YES;
       l.backgroundColor = [[UIColor clearColor] colorWithAlphaComponent:0.75f];
       l.textColor = [UIColor whiteColor];
