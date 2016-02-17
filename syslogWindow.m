@@ -15,7 +15,7 @@
     // Setup the label stuff
     textView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,150)];
     textView.textAlignment = NSTextAlignmentLeft;
-    textView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75f];
+    textView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.95f];
     textView.textColor = [UIColor whiteColor];
     textView.contentSize = textView.bounds.size;
     textView.clipsToBounds = YES;
@@ -61,24 +61,30 @@
     NSString *pid        =  [message substringWithRange:pidRange];
     NSString *type       =  [message substringWithRange:typeRange];
     NSString *log        =  [message substringWithRange:NSMakeRange(logRange.location, [message length] - logRange.location)];
-
     log = [log stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 
-    // Build final string
-    NSMutableString *build = [NSMutableString new];
-    [build appendString:date];
-    [build appendString:@" "];
-    [build appendString:device];
-    [build appendString:@" "];
-    [build appendString:process];
-    [build appendString:@"["];
-    [build appendString:pid];
-    [build appendString:@"]"];
-    [build appendString:@" <"];
-    [build appendString:type];
-    [build appendString:@">"];
-    [build appendString:@": "];
-    [build appendString:log];
+    // Colorize
+    NSAttributedString *dateAttr = [self string:date color:[UIColor grayColor]];
+    NSAttributedString *deviceAttr = [self string:device color:[UIColor blueColor]];
+    NSAttributedString *processAttr = [self string:process color:[UIColor redColor]];
+    NSAttributedString *pidAttr = [self string:pid color:[UIColor yellowColor]];
+    NSAttributedString *typeAttr = [self string:type color:[UIColor greenColor]];
+    NSAttributedString *logAttr = [self string:log color:[UIColor whiteColor]];
+
+    // // Build final string
+    NSMutableAttributedString *build = [NSMutableAttributedString new];
+    [build appendAttributedString:dateAttr];
+    [build appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+    [build appendAttributedString:deviceAttr];
+    [build appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+    [build appendAttributedString:processAttr];
+    [build appendAttributedString:[self string:@"[" color:[UIColor grayColor]]];
+    [build appendAttributedString:pidAttr];
+    [build appendAttributedString:[self string:@"]" color:[UIColor grayColor]]];
+    [build appendAttributedString:[self string:@" <" color:[UIColor grayColor]]];
+    [build appendAttributedString:typeAttr];
+    [build appendAttributedString:[self string:@">:" color:[UIColor grayColor]]];
+    [build appendAttributedString:logAttr];
 
     // Save to full message log
     [savedMessages addObject:build];
@@ -89,17 +95,25 @@
     [savedMessages removeObjectAtIndex:0];
   }
 
-  // Scroll to bottom
-  NSString *fullLog=@"";
-  for(NSString *previousLog in savedMessages){
-    fullLog = [NSString stringWithFormat:@"%@ %@\n",fullLog,previousLog];
+  // // Scroll to bottom
+  NSMutableAttributedString *fullLog = [[NSMutableAttributedString alloc] initWithString:@""];
+  for(NSMutableAttributedString *previousLog in savedMessages){
+    [fullLog appendAttributedString:previousLog];
+    [fullLog appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@"\n"]];
   }
-  [textView setText:fullLog];
+  [textView setAttributedText:fullLog];
 
   // Scroll to bottom 
   [textView setScrollEnabled:NO];  // ios7 bug
   [textView setScrollEnabled:YES]; // ios7 bug
   [textView scrollRangeToVisible:NSMakeRange([textView.text length], 0)];
+}
+
+-(NSAttributedString*)string:(NSString*)str color:(UIColor*)color{
+  NSMutableAttributedString *attrText = [[NSMutableAttributedString alloc] initWithString:str];
+  [attrText addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:8.0f] range:NSMakeRange(0, [str length])];
+  [attrText addAttribute:NSForegroundColorAttributeName value:color range:NSMakeRange(0, [str length])];
+  return attrText;
 }
 
 //Prevents touches from being blocked by the window
