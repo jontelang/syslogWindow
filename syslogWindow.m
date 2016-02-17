@@ -13,7 +13,7 @@
     self.hidden = NO;
 
     // Setup the label stuff
-    l = [[UITextView alloc] initWithFrame:CGRectMake(0,22,320,100)];
+    l = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,150)];
     l.textAlignment = NSTextAlignmentLeft;
     l.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75f];
     l.textColor = [UIColor whiteColor];
