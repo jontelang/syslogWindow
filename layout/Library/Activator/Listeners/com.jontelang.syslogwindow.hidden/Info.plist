@@ -1,0 +1,4 @@
+{
+    title = "syslogWindow hidden toggle";
+    description = "Toggles the window itself";
+}

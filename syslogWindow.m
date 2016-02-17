@@ -135,6 +135,7 @@ NSError *error = nil;
         NSLog(@"Class 'LAActivator' not found. Activator is not installed.");
     }else{
         [[laactivatorClass sharedInstance] registerListener:self forName:@"com.jontelang.syslogwindow.alpha"];
+        [[laactivatorClass sharedInstance] registerListener:self forName:@"com.jontelang.syslogwindow.hidden"];
     }
 }
 
@@ -143,7 +144,9 @@ NSError *error = nil;
      receiveEvent:(LAEvent *)event 
   forListenerName:(NSString *)listenerName{
     if( [listenerName isEqualToString:@"com.jontelang.syslogwindow.alpha"] ){
-        self.alpha = self.alpha == 1.0f ? 0.25f : 1.0f;
+      self.alpha = self.alpha == 1.0f ? 0.25f : 1.0f;
+    }else if( [listenerName isEqualToString:@"com.jontelang.syslogwindow.hidden"] ){
+      self.hidden = !self.hidden;
     }else{
         NSLog(@"hello");
     }
