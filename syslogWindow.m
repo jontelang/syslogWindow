@@ -41,7 +41,8 @@
 
   for (NSTextCheckingResult *match in matches) {
     if ([match numberOfRanges] < 6) {
-      //write(fd, buffer, len); // if entry doesn't match regex, print uncolored
+      // if entry doesn't match regex, print uncolored
+      [savedMessages addObject:message];
       continue;
     }
 
@@ -86,7 +87,6 @@
     [build appendString:log];
 
     [savedMessages addObject:build];
-    
   }
 
   // Only save the 10 latest messages
