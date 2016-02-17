@@ -13,44 +13,33 @@
     self.hidden = NO;
 
     // Setup the label stuff
-    l = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,150)];
-    l.textAlignment = NSTextAlignmentLeft;
-    l.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75f];
-    l.textColor = [UIColor whiteColor];
-    l.contentSize = l.bounds.size;
-    l.clipsToBounds = YES;
-    l.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
-    l.textContainer.lineFragmentPadding = 0;
-    l.textContainerInset = UIEdgeInsetsZero;
+    textView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,150)];
+    textView.textAlignment = NSTextAlignmentLeft;
+    textView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75f];
+    textView.textColor = [UIColor whiteColor];
+    textView.contentSize = textView.bounds.size;
+    textView.clipsToBounds = YES;
+    textView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
+    textView.textContainer.lineFragmentPadding = 0;
+    textView.textContainerInset = UIEdgeInsetsZero;
 
-    [self addSubview:l];
+    [self addSubview:textView];
 
     [self initActivatorListener];
 
     // And others
-    msgs = [[NSMutableArray alloc] init];
+    savedMessages = [[NSMutableArray alloc] init];
   }
   return self;
 }
 
 #define LINE_REGEX "(\\w+\\s+\\d+\\s+\\d+:\\d+:\\d+)\\s+(\\S+|)\\s+(\\w+)\\[(\\d+)\\]\\s+\\<(\\w+)\\>:\\s(.*)"
 -(void)addSyslogMessage:(NSString*)message{
-
-NSError *error = nil;
-  NSRegularExpression *regex = [NSRegularExpression
-                                  regularExpressionWithPattern:@LINE_REGEX
-                                  options:NSRegularExpressionCaseInsensitive
-                                  error:&error];
-
-  NSArray *matches = [regex matchesInString:message 
-                            options:0
-                            range:NSMakeRange(0, [message length])];
-
-  // if ([matches count] == 0)
-    // return write(fd, buffer, len);
+  NSError *error = nil;
+  NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@LINE_REGEX options:NSRegularExpressionCaseInsensitive error:&error];
+  NSArray *matches = [regex matchesInString:message options:0 range:NSMakeRange(0, [message length])];
 
   for (NSTextCheckingResult *match in matches) {
-
     if ([match numberOfRanges] < 6) {
       //write(fd, buffer, len); // if entry doesn't match regex, print uncolored
       continue;
@@ -68,12 +57,9 @@ NSError *error = nil;
     NSString *process    =  [message substringWithRange:processRange];
     // NSString *pid        =  [message substringWithRange:pidRange];
     NSString *type       =  [message substringWithRange:typeRange];
-    NSString *log        =  [message substringWithRange:
-                                  NSMakeRange(logRange.location,
-                                              [message length] - logRange.location)];
+    NSString *log        =  [message substringWithRange:NSMakeRange(logRange.location, [message length] - logRange.location)];
 
-    log = [log stringByTrimmingCharactersInSet:
-                [NSCharacterSet newlineCharacterSet]];
+    log = [log stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 
     NSMutableString *build = [NSMutableString new];
 
@@ -99,28 +85,25 @@ NSError *error = nil;
     [build appendString:@": "];
     [build appendString:log];
 
-    [msgs addObject:build];
+    [savedMessages addObject:build];
     
-    }
-    // printf("%s\n", [build UTF8String]);
+  }
 
-    // Only save the 10 latest messages
-    if([msgs count]>10){
-      [msgs removeObjectAtIndex:0];
-    }
+  // Only save the 10 latest messages
+  if( [savedMessages count] > 10 ){
+    [savedMessages removeObjectAtIndex:0];
+  }
 
-    // Scroll to bottom
-    NSString *ss=@"";
-    int i = 0;
-    for(NSString *s in msgs){
-      ss = [NSString stringWithFormat:@"%@%i: %@\n",ss,i,s];
-      i++;
-    }
-    [l setText:ss];
+  // Scroll to bottom
+  NSString *fullLog=@"";
+  for(NSString *previousLog in savedMessages){
+    fullLog = [NSString stringWithFormat:@"%@ %@\n",fullLog,previousLog];
+  }
+  [textView setText:fullLog];
 
-    [l setScrollEnabled:NO];
-    [l setScrollEnabled:YES];
-    [l scrollRangeToVisible:NSMakeRange([l.text length], 0)];
+  [textView setScrollEnabled:NO];
+  [textView setScrollEnabled:YES];
+  [textView scrollRangeToVisible:NSMakeRange([textView.text length], 0)];
 }
 
 //Prevents touches from being blocked by the window

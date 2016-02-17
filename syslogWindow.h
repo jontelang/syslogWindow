@@ -1,8 +1,8 @@
 #import "Activator/libactivator.h"
 @interface LogWindow: UIWindow <LAListener>
 {
-  NSMutableArray* msgs;
-  UITextView *l;
+  NSMutableArray* savedMessages;
+  UITextView *textView;
 }
 -(void)addSyslogMessage:(NSString*)message;
 @end
