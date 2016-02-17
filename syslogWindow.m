@@ -15,7 +15,7 @@
     // Setup the label stuff
     textView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,320,150)];
     textView.textAlignment = NSTextAlignmentLeft;
-    textView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.95f];
+    textView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.8f];
     textView.textColor = [UIColor whiteColor];
     textView.contentSize = textView.bounds.size;
     textView.clipsToBounds = YES;
