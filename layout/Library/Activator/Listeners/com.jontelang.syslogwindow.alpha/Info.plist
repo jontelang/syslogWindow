@@ -1,0 +1,4 @@
+{
+    title = "syslogWindow alpha toggle";
+    description = "Toggles the alpha";
+}

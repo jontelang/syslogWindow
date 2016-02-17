@@ -1,3 +1,5 @@
+#import <objc/runtime.h>
+#include <dlfcn.h>
 #include "syslogWindow.h"
 
 @implementation LogWindow
@@ -22,6 +24,8 @@
     l.textContainerInset = UIEdgeInsetsZero;
 
     [self addSubview:l];
+
+    [self initActivatorListener];
 
     // And others
     msgs = [[NSMutableArray alloc] init];
@@ -126,5 +130,36 @@ NSError *error = nil;
 - (BOOL)_ignoresHitTest {
   return YES;
 }
+
+-(void)initActivatorListener{ // if it is installed
+    dlopen("/usr/lib/libactivator.dylib", RTLD_LAZY);
+    Class laactivatorClass = objc_getClass("LAActivator");
+    if( laactivatorClass == nil ){
+        NSLog(@"Class 'LAActivator' not found. Activator is not installed.");
+    }else{
+        [[laactivatorClass sharedInstance] registerListener:self forName:@"com.jontelang.syslogwindow.alpha"];
+    }
+}
+
+
+- (void)activator:(LAActivator *)activator 
+     receiveEvent:(LAEvent *)event 
+  forListenerName:(NSString *)listenerName{
+    if( [listenerName isEqualToString:@"com.jontelang.syslogwindow.alpha"] ){
+        self.alpha = self.alpha == 1.0f ? 0.25f : 1.0f;
+    }else{
+        NSLog(@"hello");
+    }
+}
+
+// - (void)activator:(LAActivator *)activator receiveDeactivateEvent:(LAEvent *)event{
+//     if( snapperWindow != nil ){
+//         if( [snapperWindow isCropping] || [snapperWindow isPresentingSnapperHistory] ){
+//             [snapperWindow hideCropOverlay];
+//             [snapperWindow hideSnapperHistory];
+//             event.handled = YES;
+//         }
+//     }
+// }
 
 @end

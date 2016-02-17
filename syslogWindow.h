@@ -1,4 +1,5 @@
-@interface LogWindow: UIWindow
+#import "Activator/libactivator.h"
+@interface LogWindow: UIWindow <LAListener>
 {
   NSMutableArray* msgs;
   UITextView *l;
