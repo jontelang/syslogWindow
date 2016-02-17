@@ -121,9 +121,6 @@ NSError *error = nil;
     [l setScrollEnabled:NO];
     [l setScrollEnabled:YES];
     [l scrollRangeToVisible:NSMakeRange([l.text length], 0)];
-    //[l scrollRectToVisible:CGRectMake(0,0,0,FLT_MAX) animated:NO];
-    //[l setContentOffset:CGPointMake(0,l.contentSize.height-l.bounds.size.height) animated:NO];
-    // [textView scrollRectToVisible:CGRectMake(5,5,5,999999999999999999) animated:NO];//for some reason the textViewDidChange auto scrolling doesnt work with a carriage return at the end of your textView... so I manually set it INSANELY low (NOT ANIMATED) here so that it automagically bounces back to the proper position before interface refreshes when textViewDidChange is called after this.
 }
 
 //Prevents touches from being blocked by the window
