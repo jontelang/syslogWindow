@@ -19,9 +19,9 @@
     textView.textColor = [UIColor whiteColor];
     textView.contentSize = textView.bounds.size;
     textView.clipsToBounds = YES;
-    textView.contentInset = UIEdgeInsetsMake(0.0, 0.0, 0.0, 0.0);
+    textView.contentInset = UIEdgeInsetsZero;
     textView.textContainer.lineFragmentPadding = 0;
-    textView.textContainerInset = UIEdgeInsetsZero;
+    textView.textContainerInset = UIEdgeInsetsMake(2.0f, 2.0f, 2.0f, 2.0f);
 
     [self addSubview:textView];
 
