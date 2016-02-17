@@ -46,46 +46,41 @@
       continue;
     }
 
-    // NSRange dateRange    =  [match rangeAtIndex:1];
-    // NSRange deviceRange  =  [match rangeAtIndex:2];
+    // Find ranges
+    NSRange dateRange    =  [match rangeAtIndex:1];
+    NSRange deviceRange  =  [match rangeAtIndex:2];
     NSRange processRange =  [match rangeAtIndex:3];
-    // NSRange pidRange     =  [match rangeAtIndex:4];
+    NSRange pidRange     =  [match rangeAtIndex:4];
     NSRange typeRange    =  [match rangeAtIndex:5];
     NSRange logRange     =  [match rangeAtIndex:6];
 
-    // NSString *date       =  [message substringWithRange:dateRange];
-    // NSString *device     =  [message substringWithRange:deviceRange];
+    // Extract string content
+    NSString *date       =  [message substringWithRange:dateRange];
+    NSString *device     =  [message substringWithRange:deviceRange];
     NSString *process    =  [message substringWithRange:processRange];
-    // NSString *pid        =  [message substringWithRange:pidRange];
+    NSString *pid        =  [message substringWithRange:pidRange];
     NSString *type       =  [message substringWithRange:typeRange];
     NSString *log        =  [message substringWithRange:NSMakeRange(logRange.location, [message length] - logRange.location)];
 
     log = [log stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 
+    // Build final string
     NSMutableString *build = [NSMutableString new];
-
-    // [build appendString:@COLOR_DARK_WHITE];
-    // [build appendString:date];
-    // [build appendString:@" "];
-    // [build appendString:device];
-    // [build appendString:@" "];
-
-    // [build appendString:@COLOR_CYAN];
+    [build appendString:date];
+    [build appendString:@" "];
+    [build appendString:device];
+    [build appendString:@" "];
     [build appendString:process];
-    // [build appendString:@"["];
-    // [build appendString:pid];
-    // [build appendString:@"]"];
-
-    // [build appendString:@(darkTypeColor)];
+    [build appendString:@"["];
+    [build appendString:pid];
+    [build appendString:@"]"];
     [build appendString:@" <"];
-    // [build appendString:@(typeColor)];
     [build appendString:type];
-    // [build appendString:@(darkTypeColor)];
     [build appendString:@">"];
-    // [build appendString:@COLOR_RESET];
     [build appendString:@": "];
     [build appendString:log];
 
+    // Save to full message log
     [savedMessages addObject:build];
   }
 
@@ -101,8 +96,9 @@
   }
   [textView setText:fullLog];
 
-  [textView setScrollEnabled:NO];
-  [textView setScrollEnabled:YES];
+  // Scroll to bottom 
+  [textView setScrollEnabled:NO];  // ios7 bug
+  [textView setScrollEnabled:YES]; // ios7 bug
   [textView scrollRangeToVisible:NSMakeRange([textView.text length], 0)];
 }
 
