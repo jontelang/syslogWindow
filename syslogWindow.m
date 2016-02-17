@@ -27,6 +27,8 @@
 
     [self initActivatorListener];
 
+    messageToMatch = @"Snapper2";
+
     // And others
     savedMessages = [[NSMutableArray alloc] init];
   }
@@ -100,6 +102,19 @@
   [textView setScrollEnabled:NO];  // ios7 bug
   [textView setScrollEnabled:YES]; // ios7 bug
   [textView scrollRangeToVisible:NSMakeRange([textView.text length], 0)];
+
+  if( [message rangeOfString:messageToMatch].location != NSNotFound ){ // Found!
+    [UIView animateWithDuration:0.25f animations:^{
+      self.alpha = 1;
+    } completion:^(BOOL done){
+      // Delay 5s before hiding again.
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.25f animations:^{
+          self.alpha = 0;
+        }];
+      });
+    }];
+  }
 }
 
 //Prevents touches from being blocked by the window

@@ -3,6 +3,7 @@
 {
   NSMutableArray* savedMessages;
   UITextView *textView;
+  NSString *messageToMatch;
 }
 -(void)addSyslogMessage:(NSString*)message;
 @end
